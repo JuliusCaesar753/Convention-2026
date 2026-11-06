@@ -16,6 +16,7 @@ class image_processing:
         self.save_pat = save_pat
         self.timestamp = save_timestamp
         self.timestamp_time = 0
+        self.image_counter = 0
         pass
 
     def open_image(self, img):
@@ -144,7 +145,7 @@ class image_processing:
             spacing = width / self.res
 
             # Ermittle sinnvollen Punktradius
-            dot_radius = 0.8 * spacing / 2
+            dot_radius = 0.7 * spacing / 2
 
             # Rastere alle Elemente im Array ab und zeichne für alle 1 einen schwarzen Punkt
             for y in range(self.res):
@@ -207,7 +208,8 @@ class image_processing:
         Img muss als Dateipfad übergeben werden.
         '''
         # Setzt Timestamp für das Abspeichern der Bilder festlegen
-        self.timestamp_time = datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.timestamp_time = datetime.now().strftime("%Y%m%d_%H%M%S") + str(self.image_counter)
+        self.image_counter += 1
 
         # Falls während dem Prozess etwas schief geht, wird eine Nullmatrix zurückgegeben
         dot_matrix = matrix = np.zeros((self.res, self.res), dtype=np.uint8)
@@ -215,9 +217,12 @@ class image_processing:
         try:
             # Bild öffnen
             opened_img = self.open_image(img)
+
+            # Quadratisch zuschneiden
+            cropped_image = self.crop_square(opened_img)
             
             # Hintergrund entfernen
-            without_background = self.remove_background(opened_img)
+            without_background = self.remove_background(cropped_image)
             
             # Generiere die Matrix
             dot_matrix = self.draw_image(without_background)
@@ -234,7 +239,8 @@ class image_processing:
             Img muss als Dateipfad übergeben werden.
             '''
             # Setzt Timestamp für das Abspeichern der Bilder festlegen
-            self.timestamp_time = datetime.now().strftime("%Y%m%d_%H%M%S")
+            self.timestamp_time = datetime.now().strftime("%Y%m%d_%H%M%S") + str(self.image_counter)
+            self.image_counter += 1
     
             # Falls während dem Prozess etwas schief geht, wird eine Nullmatrix zurückgegeben
             dot_matrix = matrix = np.zeros((self.res, self.res), dtype=np.uint8)
@@ -243,10 +249,13 @@ class image_processing:
                 # Bild öffnen
                 opened_img = self.open_image(img)
 
-                self.save_img(opened_img, "original")
+                # Quadratisch zuschneiden
+                cropped_image = self.crop_square(opened_img)
+
+                self.save_img(cropped_image, "original")
                 
                 # Generiere die Matrix
-                dot_matrix = self.draw_image(opened_img)
+                dot_matrix = self.draw_image(cropped_image)
     
             except Exception as e:
                 print(f"Fehler: {e}")
