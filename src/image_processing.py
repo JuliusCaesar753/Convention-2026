@@ -15,7 +15,7 @@ class image_processing:
         self.save = save_img
         self.save_pat = save_pat
         self.timestamp = save_timestamp
-        self.timestamp_time = 0
+        self.timestamp_time = ""
         self.image_counter = 0
         pass
 
@@ -93,6 +93,9 @@ class image_processing:
             (self.res, self.res),
             Image.Resampling.BOX
         )
+
+        if self.save:
+                    self.save_img(small, "small")
 
         # Bildmatrix generieren
         pixels = np.array(small, dtype=np.float32)
@@ -172,6 +175,9 @@ class image_processing:
         if self.save_pat:
             if self.timestamp:
                 file_name = "output/" + self.timestamp_time + "_dot_matrix.pat"
+            else:
+                file_name = "dot_matrix.pat"
+
 
             with open(file_name, "w") as file:
                 for row in matrix[:80, :80]:
